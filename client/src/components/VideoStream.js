@@ -1,20 +1,21 @@
-import React, { useState, useEffect, useRef } from 'react';
-import styled from 'styled-components';
+import React, { useRef } from 'react';
+import styled from 'styled-components'
 import { Button } from 'react-bootstrap'
+import { useSocket } from '../contexts/SocketProvider'
 
-const Main = styled.div`
-  margin: 0 auto;
-  width: fit-content;
-`
-const VideoStream = styled.video`
+const Video = styled.video`
   border: 1px solid black;
   max-width:1080px;
   max-height:720px;
 `
 
-const App = () => {
-
+const VideoStream = () => {
   const videoRef = useRef();
+  const socket = useSocket();
+
+  const test = () => {
+    socket.emit('test')
+  }
 
   const startCapture = async () => {
 
@@ -42,23 +43,20 @@ const App = () => {
     videoRef.current.srcObject = null;
   }
 
-
   return (
-    <>
-      <Main>
-        <h1>Stream</h1>
-      </Main>
-      <VideoStream
+    <div>
+       <Video
         autoPlay
         ref={videoRef}
       >
-      </VideoStream>
+      </Video>
       <Button onClick={startCapture} variant="primary">Start</Button>
       <Button onClick={stopCapture} variant="secondary">Stop</Button>
+      <Button onClick={test} variant="secondary">Test</Button>
 
 
-    </>
+    </div>
   );
-};
+}
 
-export default App;
+export default VideoStream;
