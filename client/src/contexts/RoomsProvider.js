@@ -11,7 +11,7 @@ export const useRooms = () => {
 
 export const RoomsProvider = ({ children }) => {
 
-  const socket = useSocket()
+  const { socket } = useSocket()
   const [rooms, setRooms] = useState([]);
   const addRoom = (newRoom) => {
     setRooms(prevRooms => {
@@ -24,6 +24,9 @@ export const RoomsProvider = ({ children }) => {
       socket.emit('get rooms');
       socket.on('get rooms', data => {
         setRooms(data);
+      })
+      socket.on('add new room', newRoom => {
+        addRoom(newRoom);
       })
     }
   }, [socket]);

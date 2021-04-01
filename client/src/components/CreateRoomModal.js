@@ -1,21 +1,29 @@
 import React, { useRef } from 'react';
 import { Modal, Form, Button } from 'react-bootstrap';
-import axios from 'axios';
-import { useRooms } from '../contexts/RoomsProvider'
+import { useSocket } from '../contexts/SocketProvider';
 
 const CreateRoomModal = ({ closeModal }) => {
-  const { addRoom } = useRooms()
   const roomNameRef = useRef('');
+  const { socket } = useSocket();
+
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
+  //   const roomName = roomNameRef.current.value;
+  //   axios.post(`http://localhost:5000/${roomName}`)
+  //   .then(data => data.data)
+  //   .then(({roomName}) => {
+  //     window.location = `/${roomName}`
+  //   })
+  //   .catch(err => console.error(err)); 
+
+  //   roomNameRef.current.value = ''
+  //   closeModal();
+  // }
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const roomName = roomNameRef.current.value;
-    axios.post(`http://localhost:5000/${roomName}`)
-    .then(data => data.data)
-    .then(data => addRoom(data))
-    .catch(err => console.error(err)); 
-
-    roomNameRef.current.value = ''
+    socket.emit('create new room', roomName, socket.id);
     closeModal();
   }
 
