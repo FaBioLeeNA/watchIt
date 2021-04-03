@@ -27,7 +27,17 @@ export const RoomsProvider = ({ children }) => {
       })
       socket.on('add new room', newRoom => {
         addRoom(newRoom);
+        console.log(newRoom);
       })
+
+      //socket event listeners
+
+      if (socket) {
+        socket.on('hi', () => {
+          console.log('hi')
+        })
+      }
+      
     }
   }, [socket]);
 

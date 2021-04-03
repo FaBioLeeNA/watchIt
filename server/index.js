@@ -2,7 +2,8 @@ const express = require('express');
 const cors = require('cors')
 const app = express();
 const httpServer = require('http').createServer(app);
-const { createRoom } = require('./helper/rooms')
+const { createRoom } = require('./helper/rooms');
+const { disconnect } = require('process');
 
 app.use(cors());
 app.use(express.json())
@@ -15,7 +16,7 @@ const io = require("socket.io")(httpServer, {
 });
 
 const rooms = [];
-const users = {};
+const users = {a:'a', b:'b', c: 'c'};
 
 // app.post('/rooms/:roomName', (req, res) => {
 //   const { roomName } = req.params;
@@ -40,7 +41,6 @@ app.post('/signup', (req, res) => {
   if (id && pass) {
     if (!users[id]) {
       users[id] = pass;
-      console.log(users);
       res.sendStatus(200)
     } else {
       res.sendStatus(401)
@@ -52,20 +52,49 @@ app.post('/signup', (req, res) => {
 
 io.on('connection', socket => {
   console.log('user connected');
-  socket.on('test', () => {
-    console.log('here');
-  })
+  
 
+  //get all the rooms 
   socket.on('get rooms', () => {
     socket.emit('get rooms', rooms)
   })
   
+  //creates a new room
   socket.on('create new room', (roomName, id) => {
     const newRoom = createRoom(roomName, id)
     rooms.push(newRoom);
-    socket.join(newRoom.id);
-
     io.emit('add new room', newRoom);
+  });
+
+  //join a socket to a room
+  socket.on('join room', (roomData, userId) => {
+    const roomId = roomData.id
+    socket.join(roomId);
+
+    socket.on('test', (roomData, userId) => {
+      socket.to(roomId).emit('hi');
+      console.log(socket.rooms)
+    })
+    
+    if (!(roomData.ownerId === userId)) {
+      console.log(userId, 'join', roomId)
+      socket.to(roomData.ownerId).emit('get stream', userId)
+    }
+
+
+    socket.on('leave room', () => {
+      socket.leave(roomId)
+    })
+
+    socket.on('disconnect', () => {
+      console.log(userId, 'disconnected from room', roomData.id)
+      socket.leave(roomId)
+    })
+  });
+
+
+  socket.on('disconnect', () => {
+    console.log('a user has disconnected')
   })
 })
 

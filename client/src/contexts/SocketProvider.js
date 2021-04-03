@@ -15,9 +15,12 @@ export const SocketProvider = ({ children }) => {
   useEffect(() => {
     const newSocket = io('http://localhost:5000');
     setSocket(newSocket);
-
     return () => newSocket.close()
   }, []);
+
+  
+  
+
   
   return (
     <SocketContext.Provider value={{socket}}>
