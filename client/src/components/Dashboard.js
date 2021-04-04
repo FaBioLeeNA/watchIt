@@ -5,6 +5,7 @@ import { SocketProvider } from '../contexts/SocketProvider';
 import styled from 'styled-components'
 import Lobby from './Lobby';
 import VideoStream from './VideoStream';
+import { PeerProvider } from '../contexts/PeerProvider';
 
 const Main = styled.div`
   margin: 0 auto;
@@ -14,19 +15,21 @@ const Main = styled.div`
 const Dashboard = () => {
   return (
     <SocketProvider>
-      <RoomsProvider>   
-        <Router>
-          <Switch>
-            <Route path="/" exact>
-              <Main>
-                  <h1>Lobby</h1>
-              </Main>
-              <Lobby />
-            </Route> 
-            <Route path="/rooms/:stream" component={VideoStream} /> 
-          </Switch>
-        </Router>
-      </RoomsProvider>
+      <PeerProvider>
+        <RoomsProvider>   
+          <Router>
+            <Switch>
+              <Route path="/" exact>
+                <Main>
+                    <h1>Lobby</h1>
+                </Main>
+                <Lobby />
+              </Route> 
+              <Route path="/rooms/:stream" component={VideoStream} /> 
+            </Switch>
+          </Router>
+        </RoomsProvider>
+      </PeerProvider>
     </SocketProvider>
   );
 }

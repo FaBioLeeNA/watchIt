@@ -3,8 +3,8 @@ import styled from 'styled-components'
 import { Button } from 'react-bootstrap'
 import { useSocket } from '../contexts/SocketProvider'
 import { useRooms } from '../contexts/RoomsProvider';
-import { Link } from 'react-router-dom';
-import Peer from 'peerjs';
+import { Link, Redirect } from 'react-router-dom';
+import { usePeer } from '../contexts/PeerProvider';
 
 const Video = styled.video`
   border: 1px solid black;
@@ -16,35 +16,50 @@ const Video = styled.video`
 const VideoStream = ({ match }) => {
   const videoRef = useRef();
   const { socket } = useSocket();
+  
+  const { peer } = usePeer();
   const { rooms } = useRooms();
   const [ stream, setStream ] = useState(null)
   
   const roomData = rooms.find(room => `/rooms/${room.id}` === match.url);
-  let userId;
-  let peer;
-
-  if (socket) {
-    userId = socket.id;
-    peer = new Peer(userId, {
-      host: '/',
-      port: `5001`
-    }); 
-
-    peer.on('open', id => {
-      socket.emit('join room', roomData, id);
-    })
-
-    
-  } else {
-    window.location = '/'
-  }
   
+  const userId = socket.id;
+  
+  useEffect(() => {
+    
+    console.log(peer);
+    console.log(socket);
+    // peer.on('open', id => {
+    //   console.log('peer open')
+    //   socket.emit('join room', roomData, userId);
+    // })
+
+    const getStream = id => {
+      console.log('giving stream to', id);
+      // if (stream) {
+      //   const call = peer.call(id, stream);
+      //   console.log(call)
+      // }
+    }
+
+    socket.once('get stream', getStream);
+
+    return () => {
+      socket.off('get stream', getStream);
+    }
+    
+  }, [socket, stream, roomData, userId]);
+  if (!roomData) {
+    return <Redirect to='/' />
+  }
+
   const test = () => {
+    console.log('here')
     socket.emit('test', roomData, userId);
     console.log(stream)
+    console.log(socket)
   }
 
-  
 
   const startCapture = async () => {
 
@@ -59,14 +74,7 @@ const VideoStream = ({ match }) => {
       let captureStream = await navigator.mediaDevices.getDisplayMedia(displayMediaOptions);
       setStream(captureStream);
       videoRef.current.srcObject = captureStream;
-      // socket.on('get stream', id => {
-      //   console.log('get stream')
-      //   const call = peer.call(id, captureStream);
-      //   console.log(call)
-        // call.on('stream', stream => {
-        //   videoRef.current.srcObject = stream;
-        // })
-      // })
+      
     } catch(err) {
       console.error("Error " + err);
     }
@@ -85,12 +93,11 @@ const VideoStream = ({ match }) => {
 
   return (
     <div>
-      {stream &&
       <Video
         autoPlay
         ref={videoRef}
       />
-      }
+      
       {(userId === roomData.ownerId) ? 
         <>
           <Button onClick={startCapture} variant="primary">Start</Button>

@@ -3,8 +3,10 @@ import { Button, Modal, ListGroup } from 'react-bootstrap';
 import CreateRoomModal from './CreateRoomModal';
 import { useRooms } from '../contexts/RoomsProvider';
 import { Link } from 'react-router-dom'
+import { useSocket } from '../contexts/SocketProvider';
 
 const RoomList = () => {
+  const {socket} = useSocket();
   const {rooms} = useRooms();
   const [modalOpen, setModalOpen] = useState(false);
   
@@ -32,7 +34,7 @@ const RoomList = () => {
         ))}
       </ListGroup>
       <Button onClick={openCreateRoomModal} variant="primary">Create Room</Button>
-      <Button onClick = {() => {console.log(rooms)}} >test</Button>
+      <Button onClick = {() => {console.log(rooms, socket)}} >test</Button>
       <Modal show={modalOpen} onHide={closeCreateRoomModal}>
         <CreateRoomModal closeModal={closeCreateRoomModal}></CreateRoomModal>
       </Modal>

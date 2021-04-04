@@ -83,13 +83,14 @@ io.on('connection', socket => {
 
 
     socket.on('leave room', () => {
+      console.log(userId, 'left the room', roomData.id)
       socket.leave(roomId)
     })
 
-    socket.on('disconnect', () => {
-      console.log(userId, 'disconnected from room', roomData.id)
-      socket.leave(roomId)
-    })
+    // socket.on('disconnect', () => {
+    //   console.log(userId, 'disconnected from room', roomData.id)
+    //   socket.leave(roomId)
+    // })
   });
 
 
