@@ -49,6 +49,7 @@ const VideoStream = ({ match }) => {
     }
     
   }, [socket, stream, roomData, userId]);
+
   if (!roomData) {
     return <Redirect to='/' />
   }
@@ -56,8 +57,6 @@ const VideoStream = ({ match }) => {
   const test = () => {
     console.log('here')
     socket.emit('test', roomData, userId);
-    console.log(stream)
-    console.log(socket)
   }
 
 
