@@ -5,11 +5,11 @@ import { useSocket } from '../contexts/SocketProvider'
 import { useRooms } from '../contexts/RoomsProvider';
 import { Link, Redirect } from 'react-router-dom';
 import { usePeer } from '../contexts/PeerProvider';
+import ChatBox from './ChatBox';
 
 const Video = styled.video`
   border: 1px solid black;
-  max-width:1080px;
-  max-height:720px;
+  min-height:50vh;
 `
 
 
@@ -48,14 +48,14 @@ const VideoStream = ({ match }) => {
       socket.off('get stream', getStream);
     }
     
-  }, [socket, stream, roomData, userId]);
+  }, [socket, stream, roomData, userId, peer]);
 
   if (!roomData) {
     return <Redirect to='/' />
   }
 
   const test = () => {
-    console.log('here')
+    console.log(socket)
     socket.emit('test', roomData, userId);
   }
 
@@ -91,27 +91,31 @@ const VideoStream = ({ match }) => {
   }
 
   return (
-    <div>
-      <Video
-        autoPlay
-        ref={videoRef}
-      />
-      
-      {(userId === roomData.ownerId) ? 
-        <>
-          <Button onClick={startCapture} variant="primary">Start</Button>
-          <Button onClick={stopCapture} variant="secondary">Stop</Button>
-        </> :
-        <></>
-      }
-      <Button onClick={test} variant="info">Test</Button>
-      <Button  variant="primary">
-        <Link onClick={() => {
-          socket.emit('leave room');
-          stopCapture();
-        }
-        } style={{color: 'white', textDecoration: 'none'}} to='/'>Back</Link>
-      </Button>
+    <div className='d-flex' style={{height: '100vh'}}>
+      <div className='d-flex flex-column flex-grow-1'>
+        <Video
+          autoPlay
+          ref={videoRef}
+          />
+        <div>
+          {(userId === roomData.ownerId) ? 
+            <>
+              <Button onClick={startCapture} variant="primary">Start</Button>
+              <Button onClick={stopCapture} variant="secondary">Stop</Button>
+            </> :
+            <></>
+          }
+          <Button onClick={test} variant="info">Test</Button>
+          <Button variant="primary">
+            <Link onClick={() => {
+              socket.emit('leave room');
+              stopCapture();
+            }
+          } style={{color: 'white', textDecoration: 'none'}} to='/'>Back</Link>
+        </Button>
+        </div>
+      </div>
+      <ChatBox />
 
     </div>
   );
