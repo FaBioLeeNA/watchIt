@@ -17,3 +17,23 @@ db.once('open', function() {
   // we're connected!
   console.log('connected')
 });
+
+const { Schema } = mongoose;
+
+const userSchema = new Schema({
+  name: String,
+  password: String
+});
+
+const roomSchema = new Schema({
+  name: String,
+  owner_id: Number,
+  users: [userSchema]
+});
+
+const user = mongoose.model('user', userSchema);
+const room = mongoose.model('room', roomSchema);
+
+const createUser = (user, password) => {
+  // user.create({user, password})
+}
