@@ -3,7 +3,7 @@ const cors = require('cors')
 const app = express();
 const httpServer = require('http').createServer(app);
 const { createRoom } = require('./helper/rooms');
-const { disconnect } = require('process');
+const { createUser, findUser } = require('./database/database');
 
 app.use(cors());
 app.use(express.json())
@@ -16,7 +16,6 @@ const io = require("socket.io")(httpServer, {
 });
 
 const rooms = [];
-const users = {a:'a', b:'b', c: 'c'};
 
 // app.post('/rooms/:roomName', (req, res) => {
 //   const { roomName } = req.params;
@@ -26,22 +25,25 @@ const users = {a:'a', b:'b', c: 'c'};
 //   res.send(newRoom);
 // });
 
-app.post('/login', (req, res) => {
+app.post('/login', async (req, res) => {
   const { id, pass } = req.body; 
-  const valid = users[id] === pass
+  let data = (await findUser(id, pass))[0];
+  const valid = (data) ? true : false;
   if (valid) {
-    res.sendStatus(200);
+    let {_id, name} = data
+    res.send({_id, name});
   } else {
     res.sendStatus(401);
   }
 })
 
-app.post('/signup', (req, res) => {
+app.post('/signup', async (req, res) => {
   const { id, pass } = req.body;
   if (id && pass) {
-    if (!users[id]) {
-      users[id] = pass;
-      res.sendStatus(200)
+    let match = await findUser(id, pass)
+    if (match.length == 0) {
+      await createUser(id, pass);
+      res.sendStatus(200);
     } else {
       res.sendStatus(401)
     }

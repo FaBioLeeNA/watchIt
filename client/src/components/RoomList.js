@@ -4,11 +4,13 @@ import CreateRoomModal from './CreateRoomModal';
 import { useRooms } from '../contexts/RoomsProvider';
 import { Link } from 'react-router-dom'
 import { useSocket } from '../contexts/SocketProvider';
+import { useUser } from '../contexts/UserProvider';
 
 const RoomList = () => {
   const {socket} = useSocket();
   const {rooms} = useRooms();
   const [modalOpen, setModalOpen] = useState(false);
+  const { user } = useUser();
   
 
   const openCreateRoomModal = e => {
@@ -34,7 +36,7 @@ const RoomList = () => {
         ))}
       </ListGroup>
       <Button onClick={openCreateRoomModal} variant="primary">Create Room</Button>
-      <Button onClick = {() => {console.log(rooms, socket)}} >test</Button>
+      <Button onClick = {() => {console.log(rooms, socket, user)}} >test</Button>
       <Modal show={modalOpen} onHide={closeCreateRoomModal}>
         <CreateRoomModal closeModal={closeCreateRoomModal}></CreateRoomModal>
       </Modal>

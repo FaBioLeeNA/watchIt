@@ -2,9 +2,10 @@ import React, { useRef } from 'react';
 import { Button } from 'react-bootstrap';
 import { Form, Modal } from 'react-bootstrap';
 import axios from 'axios'
+import { useUser } from '../contexts/UserProvider';
 
 const LoginModal = ({hideModal, setLoged }) => {
-  
+  const { userSetter } = useUser();
   const usernameRef = useRef();
   const passwordRef = useRef();
 
@@ -16,19 +17,20 @@ const LoginModal = ({hideModal, setLoged }) => {
         id,
         pass
       }
-    }).then(data => success())
-    .catch(err => fail());
+    }).then(data => success(data.data))
+    .catch(err => fail(err));
   }
 
   const handleSubmit = e => {
     e.preventDefault();
     loginCredentials(usernameRef.current.value, 
       passwordRef.current.value, 
-      () => {
+      (data) => {
+        userSetter(data);
         setLoged(true);
         hideModal();
       },
-      () => {
+      (err) => {
         alert('invalid credential')
       }
     )
